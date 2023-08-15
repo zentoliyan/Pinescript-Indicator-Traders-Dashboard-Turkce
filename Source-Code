@@ -1,0 +1,743 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © zeubetella
+
+// https://twitter.com/zeubetella
+// İndikatör içerisinde @YgtKyn 'ın oluşturduğu "EFSUN" indikatörü de parametrelerden biri olarak kullanılmıştır, katkılarından ötürü teşekkür ederim.
+
+//@version=5
+indicator("Trader's Dashboard - Türkçe", shorttitle="Trader's Dashboard", overlay=true)
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Birinci Tablo Kimliği ve Stili ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Birinci Tablo Kimliği ve Stili
+
+rawNumberforTable1 = 50
+var string TableGroup1 = "Tablo 1 | Özellikler"
+string  Table1PosInYaxis = input.string("middle", "Tablo Pozisyonu", inline = "11", options = ["top", "middle", "bottom"], group = TableGroup1)
+string  Table1PosInXaxis = input.string("right", "", inline = "11", options = ["left", "center", "right"], group = TableGroup1)
+var table table1 = table.new(Table1PosInYaxis + "_" + Table1PosInXaxis, 2, rawNumberforTable1 + 1, color.new(color.black , 40), color.new(color.white , 0), 1,color.new(color.white , 0), 1)
+
+
+textstyleFORtable1 = input.string(size.small, "Metin Boyutu", options=[size.small, size.normal, size.large], group = TableGroup1)
+
+//#endregion Birinci Tablo Kimliği ve Stili
+
+////////////////////////////////////////////////// ===== Birinci Tablo Kimliği ve Stili ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- İkinci Tablo Kimliği ve Stili ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region İkinci Tablo Kimliği ve Stili
+
+rawNumberforTable2 = 20
+var string TableGroup2 = "Tablo 2 | Özellikler"
+string  Table2PosInYaxis = input.string("middle", "Tablo Pozisyonu", inline = "11", options = ["top", "middle", "bottom"], group = TableGroup2)
+string  Table2PosInXaxis = input.string("left", "", inline = "11", options = ["left", "center", "right"], group = TableGroup2)
+var table table2 = table.new(Table2PosInYaxis + "_" + Table2PosInXaxis, 2, rawNumberforTable2+1, color.new(color.black , 40), color.new(color.white , 0), 1 ,color.new(color.white , 0),1)
+
+textstyleFORtable2 = input.string(size.small, "Metin Boyutu", options=[size.small, size.normal, size.large], group = TableGroup2)
+
+//#endregion İkinci Tablo Kimliği ve Stili
+
+////////////////////////////////////////////////// ===== İkinci Tablo Kimliği ve Stili ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Üçüncü Tablo Kimliği ve Stili ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Üçüncü Tablo Kimliği ve Stili
+
+rawNumberforTable3 = 20
+var string TableGroup3 = "Tablo 3 | Özellikler"
+string  Table3PosInYaxis = input.string("bottom", "Tablo Pozisyonu", inline = "11", options = ["top", "middle", "bottom"], group = TableGroup3)
+string  Table3PosInXaxis = input.string("center", "", inline = "11", options = ["left", "center", "right"], group = TableGroup3)
+var table table3 = table.new(Table3PosInYaxis + "_" + Table3PosInXaxis, 20, rawNumberforTable3+1, color.new(color.black , 40), color.rgb(246, 235, 235),1,color.rgb(246, 235, 235),1)
+
+textstyleFORtable3 = input.string(size.small, "Metin Boyutu", options=[size.small, size.normal, size.large], group = TableGroup3)
+
+//#endregion Üçüncü Tablo Kimliği ve Stili
+
+////////////////////////////////////////////////// ===== Üçüncü Tablo Kimliği ve Stili ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+source = input(close, title="Hesaplama Kaynağı" , group = "Hesaplama Kaynağı")
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- EFSUN ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region EFSUN
+
+EFSUNvariable1 = input(10, title="MA Periyodu / Ma Period", group = "EFSUN Veri Ayarları")
+float EFSUNvariable2 = input(0.5, title="Yüzde / Percentage", group = "EFSUN Veri Ayarları")
+ab = 2/(EFSUNvariable1+1)
+
+// Burada "cd" / "EXMOV" hesaplaması yapılıyor.
+
+var float cd = na
+var float[] hourlyData = array.new_float()
+
+isLessThan1Hour = timeframe.isminutes and timeframe.multiplier < 61
+
+updateHourlyData() =>
+    if isLessThan1Hour
+        array.unshift(hourlyData, ta.ema(close, EFSUNvariable1))
+
+calculateCD() =>
+    isLessThan1Hour ? array.get(hourlyData, 0) : ta.ema(close, 10)
+
+updateHourlyData()
+cd := calculateCD()
+
+// Burada "MOST" hesaplaması yapılıyor.
+
+avg0 = ta.ema(close , EFSUNvariable1)
+
+avg1 = avg0 - (avg0 * EFSUNvariable2 / 100)
+avg2 = avg0 + (avg0 * EFSUNvariable2 / 100)
+
+var float line1 = na
+var float line2 = na
+
+line1 := na(line1[1]) ? avg1 : (avg0 < line1[1] ? avg1 : (avg1 > line1[1] ? avg1 : line1[1]))
+line2 := na(line2[1]) ? avg2 : (avg0 > line2[1] ? avg2 : (avg2 < line2[1] ? avg2 : line2[1]))
+
+cond1 = ta.crossover(avg0, line2[1])
+cond2 = ta.crossunder(line1[1], avg0)
+
+s1 = ta.barssince(cond1) < ta.barssince(cond2)
+s2 = s1 ? line1 : line2
+
+// "MOST" ve "ExMov" kesişimleri burada tanımlanıyor ve ekrana yazdırılıyor.
+
+EFSUNcondbuy = cd > s2
+EFSUNcondsell = cd < s2
+
+EFSUNsit = cd > s2 ? "Al" : ""
+EFSUNsit += cd < s2 ? "Sat" : ""
+
+EFSUNsit_color = EFSUNcondbuy ? color.white : EFSUNcondsell ? color.yellow : color.white
+
+//#endregion EFSUN
+
+////////////////////////////////////////////////// ===== EFSUN ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- EMA Crossover 1 ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region EMA Crossover 1
+
+first_compared_ema_length = input.int(9, title="EMA Periyodu - 1", group = "İki EMA'nın durumunu karşılaştırma - 1")
+
+first_compared_ema = ta.ema(source , first_compared_ema_length)
+
+second_compared_ema_length = input.int(30, title="EMA Periyodu - 2", group = "İki EMA'nın durumunu karşılaştırma - 1")
+
+second_compared_ema = ta.ema(source , second_compared_ema_length)
+
+crossover9EMA30cond = first_compared_ema > second_compared_ema ? "Bullish":""
+crossover9EMA30cond +=  first_compared_ema < second_compared_ema ? "Bearish" : ""
+crossover9EMA30cond_color= first_compared_ema > second_compared_ema ? color.green:color.red
+
+//#endregion EMA Crossover 1
+
+////////////////////////////////////////////////// ===== EMA Crossover 1 ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- EMA Crossover 2 ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region EMA Crossover 2
+
+third_compared_ema_length = input.int(5, title="EMA Periyodu - 1", group = "İki EMA'nın durumunu karşılaştırma - 2")
+
+third_compared_ema = ta.ema(source , third_compared_ema_length)
+
+fourth_compared_ema_length = input.int(22, title="EMA Periyodu - 2", group = "İki EMA'nın durumunu karşılaştırma - 2")
+
+fourth_compared_ema = ta.ema(source , fourth_compared_ema_length)
+
+crossover5EMA22cond = third_compared_ema > fourth_compared_ema ? "Bullish":""
+crossover5EMA22cond +=  third_compared_ema < fourth_compared_ema ? "Bearish" : ""
+crossover5EMA22cond_color= third_compared_ema > fourth_compared_ema ? color.green:color.red
+
+//#endregion EMA Crossover 2
+
+////////////////////////////////////////////////// ===== EMA Crossover 2 ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- WMA Crossover 1 ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region WMA Crossover 1
+
+first_compared_wma_length = input.int(9, title="WMA Periyodu - 1", group = "İki WMA'nın durumunu karşılaştırma - 1")
+
+first_compared_wma = ta.wma(source , third_compared_ema_length)
+
+second_compared_wma_length = input.int(15, title="WMA Periyodu - 2", group = "İki WMA'nın durumunu karşılaştırma - 1")
+
+second_compared_wma = ta.wma(source , second_compared_wma_length)
+
+crossover9WMA15cond = first_compared_wma > second_compared_wma ? "Bullish":""
+crossover9WMA15cond +=  first_compared_wma < second_compared_wma ? "Bearish" : ""
+crossover9WMA15cond_color= first_compared_wma > second_compared_wma ? color.green:color.red
+
+//#endregion WMA Crossover 1
+
+////////////////////////////////////////////////// ===== WMA Crossover 1 ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- WMA Crossover 2 ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region WMA Crossover 2
+
+third_compared_wma_length = input.int(10, title="WMA Periyodu - 1", group = "İki WMA'nın durumunu karşılaştırma - 2")
+
+third_compared_wma = ta.wma(source , third_compared_wma_length)
+
+fourth_compared_wma_length = input.int(20, title="WMA Periyodu - 2", group = "İki WMA'nın durumunu karşılaştırma - 2")
+
+fourth_compared_wma = ta.wma(source , fourth_compared_wma_length)
+
+crossover10WMA20cond = third_compared_wma > fourth_compared_wma ? "Bullish":""
+crossover10WMA20cond +=  third_compared_wma < fourth_compared_wma ? "Bearish" : ""
+crossover10WMA20cond_color= third_compared_wma > fourth_compared_wma ? color.green:color.red
+
+//#endregion WMA Crossover 2
+
+////////////////////////////////////////////////// ===== WMA Crossover 2 ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Relative Strength Index ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Relative Strength Index
+
+lengthRSI = input.int(14, "RSI period", minval=1, group = "RSI Ayarları")
+RSIoverbought = input.int(70, "RSI Aşırı Satım", minval=1, group = "RSI Ayarları")
+RSIoversold = input.int(30, "RSI Aşırı Alım", minval=1, group = "RSI Ayarları")
+
+rsi = ta.rsi(close,lengthRSI)
+
+rsiSitCond = rsi < RSIoversold ? "Aşırı Satım" : ""
+rsiSitCond += rsi > RSIoverbought ? "Aşırı Alım" : ""
+rsiSitCond += rsi <= RSIoverbought and rsi >= RSIoversold ? "Normal": ""
+rsiSitCond_color = rsi < RSIoversold ? color.green: rsi > RSIoverbought ? color.red : color.white
+
+//#endregion Relative Strength Index
+
+////////////////////////////////////////////////// ===== Relative Strength Index ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- MACD ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region MACD
+
+// Getting inputs
+fast_length = input(title="Fast Length", defval=12 , group = "MACD Ayarları")
+slow_length = input(title="Slow Length", defval=26 , group = "MACD Ayarları")
+MACDsrc = input(title="Source", defval=close , group = "MACD Ayarları")
+signal_length = input.int(title="Signal Smoothing",  minval = 1, maxval = 50, defval = 9 , group = "MACD Ayarları")
+
+[_, signalLine, _] = ta.macd(MACDsrc, fast_length, slow_length, signal_length)
+[macdline, _ , _] = ta.macd(MACDsrc, fast_length, slow_length, signal_length)
+
+macdCond = ""
+macdCond_color = color.white
+
+if macdline >= signalLine
+    macdCond := "Bullish"
+    macdCond_color := color.green
+
+if macdline < signalLine
+    macdCond := "Bearish"
+    macdCond_color := color.red
+
+//#endregion MACD
+
+////////////////////////////////////////////////// ===== MACD ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- BULL AND BEAR POWER ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region BULL AND BEAR POWER
+
+BBPlength = input(13, "Length", group = "Bull And Bear Power Ayarları")
+
+lengthInput = BBPlength
+bullPower = high - ta.ema(close, lengthInput)
+bearPower = low - ta.ema(close, lengthInput)
+totalpower = bullPower + bearPower
+
+roundedTotalPower = math.round(totalpower , 2)
+roundedTotalPower_color = roundedTotalPower >= 0 ? color.green:color.red
+
+//#endregion BULL AND BEAR POWER
+
+////////////////////////////////////////////////// ===== BULL AND BEAR POWER ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- ADX ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region ADX
+
+adxlen = input(14, title="ADX Smoothing", group = "ADX Ayarları")
+dilen = input(14, title="DI Length", group = "ADX Ayarları")
+dirmov(len) =>
+	up = ta.change(high)
+	down = -ta.change(low)
+	plusDM = na(up) ? na : (up > down and up > 0 ? up : 0)
+	minusDM = na(down) ? na : (down > up and down > 0 ? down : 0)
+	truerange = ta.rma(ta.tr, len)
+	plus = fixnan(100 * ta.rma(plusDM, len) / truerange)
+	minus = fixnan(100 * ta.rma(minusDM, len) / truerange)
+	[plus, minus]
+adx(dilen, adxlen) =>
+	[plus, minus] = dirmov(dilen)
+	sum = plus + minus
+	adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), adxlen)
+sig = adx(dilen, adxlen)
+
+roundedADXvalue = math.round(sig , 2)
+roundedADXvalue_color = roundedADXvalue >= 30 ? color.green:color.red
+
+ADXsitCondition = sig > 30 ? "Bullish" : sig < 30 ? "Bearish":""
+ADXsitCondition_color = sig >= 30 ? color.green:color.red
+
+//#endregion ADX
+
+////////////////////////////////////////////////// ===== ADX ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- CCI ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region CCI
+
+CCIlength = input.int(20, minval=1 ,title = "CCI Uzunluğu", group = "CCI Ayarları")
+CCIsrc = input(hlc3, title="CCI Kaynağı" , group = "CCI Ayarları")
+
+cci = ta.cci(CCIsrc , CCIlength)
+
+CCIsitCondition = ""
+CCIsitCondition_color = color.white
+
+if cci >= 100
+    CCIsitCondition := "Bullish"
+    CCIsitCondition_color := color.green
+
+if cci < 100
+    CCIsitCondition := "Bearish"
+    CCIsitCondition_color := color.red
+
+
+//#endregion CCI
+
+////////////////////////////////////////////////// ===== CCI ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Chande Momentum Oscilator ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Chande Momentum Oscilator
+
+CMOlength = input.int(9, minval=1, group = "CMO Ayarları")
+CMOsrc = input(close, "Source", group = "CMO Ayarları")
+momm = ta.change(CMOsrc)
+f1(m) => m >= 0.0 ? m : 0.0
+f2(m) => m >= 0.0 ? 0.0 : -m
+
+CMOcond1 = f1(momm)
+CMOcond2 = f2(momm)
+CMOcond3 = math.sum(CMOcond1, CMOlength)
+CMOcond4 = math.sum(CMOcond2, CMOlength)
+percent(nom, div) => 100 * nom / div
+
+chandeMO = percent(CMOcond3-CMOcond4, CMOcond3+CMOcond4) 
+
+roundedchandeMOvalue = math.round(chandeMO , 2)
+roundedchandeMOvalue_color = roundedchandeMOvalue >= 0 ? color.green:color.red
+
+chandeMOsit = ""
+chandeMOsit_color = color.white
+
+if chandeMO >= 50
+    chandeMOsit := "Aşırı Satım"
+    chandeMOsit_color := color.red
+
+if chandeMO < -50
+    chandeMOsit := "Aşırı Alım"
+    chandeMOsit_color := color.green
+
+if chandeMO >= -50 and chandeMO <= 50
+    chandeMOsit := "Normal"
+    chandeMOsit_color := color.white
+
+//#endregion Chande Momentum Oscilator
+
+////////////////////////////////////////////////// ===== Chande Momentum Oscilator ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Hacim Değişimi ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Hacim Değişimi
+
+// Son 10 Bardaki Hacim Değişimi
+
+SonXBardakiHacimDegisimi = input(10, "Son X Bar" , group = "Hacim Değişimi")
+
+XprevVolume = request.security(syminfo.tickerid, timeframe.period , volume[SonXBardakiHacimDegisimi])
+XcurrentVolume = volume
+
+XvolumeChangePercent = ((XcurrentVolume - XprevVolume) / XprevVolume) * 100
+XvolumeChangePercent_color = XcurrentVolume > XprevVolume ? color.green : color.red
+
+XvolumeChangeTostring = str.tostring(XvolumeChangePercent, format.percent)
+
+
+// Son 20 Bardaki Hacim Değişimi
+
+SonXXBardakiHacimDegisimi = input(20, "Son XX Bar" , group = "Hacim Değişimi")
+
+XXprevVolume = request.security(syminfo.tickerid, timeframe.period , volume[SonXXBardakiHacimDegisimi])
+XXcurrentVolume = volume
+
+XXvolumeChangePercent = ((XXcurrentVolume - XXprevVolume) / XXprevVolume) * 100
+XXvolumeChangePercent_color = XXcurrentVolume > XXprevVolume ? color.green : color.red
+
+XXvolumeChangeTostring = str.tostring(XXvolumeChangePercent, format.percent)
+
+
+// Son 30 Bardaki Hacim Değişimi
+
+SonXXXBardakiHacimDegisimi = input(30, "Son XXX Bar" , group = "Hacim Değişimi")
+
+XXXprevVolume = request.security(syminfo.tickerid, timeframe.period , volume[SonXXXBardakiHacimDegisimi])
+XXXcurrentVolume = volume
+
+XXXvolumeChangePercent = ((XXXcurrentVolume - XXXprevVolume) / XXXprevVolume) * 100
+XXXvolumeChangePercent_color = XXXcurrentVolume > XXXprevVolume ? color.green : color.red
+
+XXXvolumeChangeTostring = str.tostring(XXXvolumeChangePercent, format.percent)
+
+//#endregion Hacim Değişimi
+
+////////////////////////////////////////////////// ===== Hacim Değişimi ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Üssel Hareketli Ortalamalar ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Üssel Hareketli Ortalamalar
+
+emaperiod1 = input.int(5, "EMA 1 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema1=ta.ema(close, emaperiod1)
+ema1_display = input(false, "EMA 1 - Çizgisini Görüntüle", group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema1_display ? ema1 : na, title='EMA 1 - Çizgisini Görüntüle', color=color.aqua, linewidth=1, display=display.pane)
+belowema = close>ema1 ? str.tostring(emaperiod1)+" - " :""
+underema = close<ema1 ? str.tostring(emaperiod1)+" - " :""
+
+emaperiod2 = input.int(9, "EMA 2 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema2=ta.ema(close, emaperiod2)
+ema2_display = input(false, "EMA 2 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema2_display ? ema2 : na, title='EMA 2 - Çizgisini Görüntüle', color=color.fuchsia, linewidth=1, display=display.pane)
+belowema += close>ema2 ? str.tostring(emaperiod2)+" - " :""
+underema += close<ema2 ? str.tostring(emaperiod2)+" - " :""
+
+emaperiod3 = input.int(20, "EMA 3 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema3=ta.ema(close, emaperiod3)
+ema3_display = input(false, "EMA 3 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema3_display ? ema3 : na, title='EMA 3 - Çizgisini Görüntüle', color=color.gray, linewidth=1, display=display.pane)
+belowema += close>ema3 ? str.tostring(emaperiod3)+" - " :""
+underema += close<ema3 ? str.tostring(emaperiod3)+" - " :""
+
+emaperiod4 = input.int(22, "EMA 4 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema4=ta.ema(close, emaperiod4)
+ema4_display = input(false, "EMA 4 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema4_display ? ema4 : na, title='EMA 4 - Çizgisini Görüntüle', color=color.green, linewidth=1, display=display.pane)
+belowema += close>ema4 ? str.tostring(emaperiod4)+" - " :""
+underema += close<ema4 ? str.tostring(emaperiod4)+" - " :""
+
+emaperiod5 = input.int(30, "EMA 5 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema5=ta.ema(close, emaperiod5)
+ema5_display = input(false, "EMA 5 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema5_display ? ema5 : na, title='EMA 5 - Çizgisini Görüntüle', color=color.maroon, linewidth=1, display=display.pane)
+belowema += close>ema5 ? str.tostring(emaperiod5)+" - " :""
+underema += close<ema5 ? str.tostring(emaperiod5)+" - " :""
+
+emaperiod6 = input.int(50, "EMA 6 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema6=ta.ema(close, emaperiod6)
+ema6_display = input(false, "EMA 6 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema6_display ? ema6 : na, title='EMA 6 - Çizgisini Görüntüle', color=color.navy, linewidth=1, display=display.pane)
+belowema += close>ema6 ? str.tostring(emaperiod6)+" - " :""
+underema += close<ema6 ? str.tostring(emaperiod6)+" - " :""
+
+emaperiod7 = input.int(100, "EMA 7 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema7=ta.ema(close, emaperiod7)
+ema7_display = input(false, "EMA 7 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema7_display ? ema7 : na, title='EMA 7 - Çizgisini Görüntüle', color=color.orange, linewidth=1, display=display.pane)
+belowema += close>ema7 ? str.tostring(emaperiod7)+" - " :""
+underema += close<ema7 ? str.tostring(emaperiod7)+" - " :""
+
+emaperiod8 = input.int(200, "EMA 8 - Period", minval=1 , group = "Üssel Hareketli Ortalamalar")
+ema8=ta.ema(close, emaperiod8)
+ema8_display = input(false, "EMA 8 - Çizgisini Görüntüle" , group = "Üssel Hareketli Ortalama Çizgileri" )
+plot(ema8_display ? ema8 : na, title='EMA 8 - Çizgisini Görüntüle', color=color.white, linewidth=1, display=display.pane)
+belowema += close>ema8 ? str.tostring(emaperiod8)+" " :""
+underema += close<ema8 ? str.tostring(emaperiod8)+" " :""
+
+//#endregion Üssel Hareketli Ortalamalar
+
+////////////////////////////////////////////////// ===== Üssel Hareketli Ortalamalar ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// ----- Ağırlıklı Hareketli Ortalamalar ----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Ağırlıklı Hareketli Ortalamalar
+
+wmaperiod1 = input.int(9, "WMA 1 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma1=ta.wma(close, wmaperiod1)
+wma1_display = input(false, "WMA 1 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma1_display ? wma1 : na, title='WMA 1 - Çizgisini Görüntüle', color=color.aqua, linewidth=1, display=display.pane)
+belowWma = close > wma1 ? str.tostring(wmaperiod1) + " - " : ""
+underwma = close < wma1 ? str.tostring(wmaperiod1) + " - " : ""
+
+wmaperiod2 = input.int(15, "WMA 2 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma2=ta.wma(close, wmaperiod2)
+wma2_display = input(false, "WMA 2 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma2_display ? wma2 : na, title='WMA 2 - Çizgisini Görüntüle', color=color.fuchsia, linewidth=1, display=display.pane)
+belowWma += close > wma2 ? str.tostring(wmaperiod2) + " - " : ""
+underwma += close < wma2 ? str.tostring(wmaperiod2) + " - " : ""
+
+wmaperiod3 = input.int(30, "WMA 3 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma3=ta.wma(close, wmaperiod3)
+wma3_display = input(false, "WMA 3 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma1_display ? wma3 : na, title='WMA 3 - Çizgisini Görüntüle', color=color.gray, linewidth=1, display=display.pane)
+belowWma += close > wma3 ? str.tostring(wmaperiod3) + " - " : ""
+underwma += close < wma3 ? str.tostring(wmaperiod3) + " - " : ""
+
+wmaperiod4 = input.int(22, "WMA 4 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma4=ta.wma(close, wmaperiod4)
+wma4_display = input(false, "WMA 4 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma4_display ? wma4 : na, title='WMA 4 - Çizgisini Görüntüle', color=color.green, linewidth=1, display=display.pane)
+belowWma += close > wma4 ? str.tostring(wmaperiod4) + " - " : ""
+underwma += close < wma4 ? str.tostring(wmaperiod4) + " - " : ""
+
+wmaperiod5 = input.int(30, "WMA 5 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma5=ta.wma(close, wmaperiod5)
+wma5_display = input(false, "WMA 5 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma5_display ? wma5 : na, title='WMA 5 - Çizgisini Görüntüle', color=color.maroon, linewidth=1, display=display.pane)
+belowWma += close > wma5 ? str.tostring(wmaperiod5) + " - " : ""
+underwma += close < wma5 ? str.tostring(wmaperiod5) + " - " : ""
+
+wmaperiod6 = input.int(50, "WMA 6 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma6=ta.wma(close, wmaperiod6)
+wma6_display = input(false, "WMA 6 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma6_display ? wma6 : na, title='WMA 6 - Çizgisini Görüntüle', color=color.navy, linewidth=1, display=display.pane)
+belowWma += close > wma6 ? str.tostring(wmaperiod6) + " - " : ""
+underwma += close < wma6 ? str.tostring(wmaperiod6) + " - " : ""
+
+wmaperiod7 = input.int(100, "WMA 7 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma7=ta.wma(close, wmaperiod7)
+wma7_display = input(false, "WMA 7 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma7_display ? wma7 : na, title='WMA 7 - Çizgisini Görüntüle', color=color.orange, linewidth=1, display=display.pane)
+belowWma += close > wma7 ? str.tostring(wmaperiod7) + " - " : ""
+underwma += close < wma7 ? str.tostring(wmaperiod7) + " - " : ""
+
+wmaperiod8 = input.int(200, "WMA 8 - Period", minval=1 , group = "Ağırlıklı Hareketli Ortalamalar")
+wma8=ta.wma(close, wmaperiod8)
+wma8_display = input(false, "WMA 8 - Çizgisini Görüntüle", group = "Ağırlıklı Hareketli Ortalama Çizgileri" )
+plot(wma8_display ? wma8 : na, title='WMA 8 - Çizgisini Görüntüle', color=color.white, linewidth=1, display=display.pane)
+belowWma += close > wma8 ? str.tostring(wmaperiod8) + " " : ""
+underwma += close < wma8 ? str.tostring(wmaperiod8) + " " : ""
+
+//#endregion Ağırlıklı Hareketli Ortalamalar
+
+////////////////////////////////////////////////// ===== Ağırlıklı Hareketli Ortalamalar ===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// -----Birinci Tablo - Cell Detayları----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region Birinci Tablo - Cell Detayları
+
+table.cell(table1, 0, 0, "İndikatör / Şart"   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 0, "Durum"   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.white)
+
+table.cell(table1, 0, 1, "RSI Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 1, rsiSitCond   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color= rsiSitCond_color)
+
+table.cell(table1, 0, 2, "MACD Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 2, macdCond   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=macdCond_color)
+
+table.cell(table1, 0, 5, "ADX Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 5, ADXsitCondition   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = ADXsitCondition_color)
+
+table.cell(table1, 0, 6, "CCI Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 6, CCIsitCondition   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = CCIsitCondition_color)
+
+table.cell(table1, 0, 7, "Chande MO Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 7,  chandeMOsit , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = chandeMOsit_color)
+
+table.cell(table1, 0, 8, "Boğa ve Ayı Gücü Durumu"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 8, str.tostring(roundedTotalPower)   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = roundedTotalPower_color)
+
+table.cell(table1, 0, 9, str.tostring(SonXBardakiHacimDegisimi) + " Bardaki Hacim Değişimi"    , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 9,  XvolumeChangeTostring   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = XvolumeChangePercent_color)
+
+table.cell(table1, 0, 10, str.tostring(SonXXBardakiHacimDegisimi) + " Bardaki Hacim Değişimi"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 10, XXvolumeChangeTostring   , text_halign =text.align_center, text_size= textstyleFORtable1, text_color = XXvolumeChangePercent_color)
+
+table.cell(table1, 0, 11, str.tostring(SonXXXBardakiHacimDegisimi) + " Bardaki Hacim Değişimi"    , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 11, XXXvolumeChangeTostring   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color = XXXvolumeChangePercent_color)
+
+table.cell(table1, 0, 12, str.tostring(first_compared_ema_length) + "/" + str.tostring(second_compared_ema_length) + " EMA Cross"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 12, crossover9EMA30cond , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=crossover9EMA30cond_color)
+
+table.cell(table1, 0, 13, str.tostring(third_compared_ema_length) + "/" + str.tostring(fourth_compared_ema_length) + " EMA Cross"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 13, crossover5EMA22cond , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=crossover5EMA22cond_color)
+
+table.cell(table1, 0, 14, "Fiyat > EMAs"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 14, belowema   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.green)
+
+table.cell(table1, 0, 15, "Fiyat < EMA" , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 15, underema   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.red)
+
+table.cell(table1, 0, 16, str.tostring(first_compared_wma_length)+"/"+str.tostring(second_compared_wma_length) + " WMA Cross"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 16, crossover9WMA15cond , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=crossover9WMA15cond_color)
+
+table.cell(table1, 0, 17, str.tostring(third_compared_wma_length)+"/"+str.tostring(fourth_compared_wma_length) + " WMA Cross"   , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 17, crossover10WMA20cond , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=crossover10WMA20cond_color)
+
+table.cell(table1, 0, 18, "Fiyat > WMAs" , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 18, belowWma   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.green)
+
+table.cell(table1, 0, 19, "Fiyat < WMAs" , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 19, underwma   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color=color.red)
+
+table.cell(table1, 0, 20, "EFSUN" , text_halign = text.align_left, text_size= textstyleFORtable1, text_color=color.white)
+table.cell(table1, 1, 20, EFSUNsit   , text_halign = text.align_center, text_size= textstyleFORtable1, text_color= EFSUNsit_color)
+
+
+//#endregion Birinci Tablo
+
+////////////////////////////////////////////////// =====Birinci Tablo - Cell Detayları===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// -----İkinci Tablo - Cell Detayları----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+//#region İkinci Tablo - Cell Detayları
+
+table.cell(table2, 0, 0, "İndikatör / Şart"   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 0, "Değer"   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color=color.white)
+
+table.cell(table2, 0, 1, "RSI Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 1, str.tostring(math.round(rsi , 2))   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color= color.purple)
+
+table.cell(table2, 0, 2, "MACD Ana Hat Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 2, str.tostring(math.round(macdline , 2))   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color=color.blue)
+
+table.cell(table2, 0, 3, "MACD Sinyal Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 3, str.tostring(math.round(signalLine , 2))   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color=color.orange)
+
+table.cell(table2, 0, 4, "ADX Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 4, str.tostring(roundedADXvalue)   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color = roundedADXvalue_color)
+
+table.cell(table2, 0, 5, "CCI Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 5, str.tostring(math.round(cci , 2)) , text_halign = text.align_center, text_size= textstyleFORtable2, text_color = CCIsitCondition_color)
+
+table.cell(table2, 0, 6, "Chande MO Değeri"   , text_halign = text.align_left, text_size= textstyleFORtable2, text_color=color.white)
+table.cell(table2, 1, 6, str.tostring(roundedchandeMOvalue)   , text_halign = text.align_center, text_size= textstyleFORtable2, text_color = roundedchandeMOvalue_color)
+
+//#endregion İkinci Tablo - Cell Detayları
+
+////////////////////////////////////////////////// =====İkinci Tablo - Cell Detayları===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// •-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•-•- \\
+
+////////////////////////////////////////////////// -----Üçüncü Tablo - Cell Detayları----- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\.
+
+//#region Üçüncü Tablo - Cell Detayları
+
+guncelhacim = volume
+
+acilisfiyat = open
+roundedacilisfiyat = math.round(acilisfiyat , 3)
+
+yuksekfiyat = high
+roundedyuksekfiyat = math.round(yuksekfiyat , 3)
+
+dusukfiyat = low
+roundeddusukfiyat = math.round(dusukfiyat , 3)
+
+guncelfiyat = close
+roundedguncelfiyat = math.round(guncelfiyat , 3)
+
+kapanisfiyat = close[1]
+roundedkapanisfiyat = math.round(kapanisfiyat , 3)
+
+/////
+var float OncekiKapanisaGoreDegisim = 0.0
+
+if close > kapanisfiyat
+    OncekiKapanisaGoreDegisim := (((close - kapanisfiyat) / kapanisfiyat) * 100)
+else
+	OncekiKapanisaGoreDegisim := (((close - kapanisfiyat) / kapanisfiyat) * 100)
+/////
+var float AcilisaGoreDegisim = 0.0
+
+if close > open
+    AcilisaGoreDegisim := (((close - open) / open) * 100)
+else
+	AcilisaGoreDegisim := (((open - close) / close) * 100)
+
+OncekiKapanisaGoreDegisim_color = OncekiKapanisaGoreDegisim >= 0 ? color.green:color.red
+AcilisaGoreDegisim_color = AcilisaGoreDegisim >= 0 ? color.green:color.red
+
+// Tablo yazdırma işlemleri
+
+table.cell(table3, 0, 0, "Güncel \nİşlem Hacmi"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 0, 1, str.tostring(guncelhacim , format.volume)   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 1, 0, "Güncel"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 1, 1, str.tostring(roundedguncelfiyat) + " " + syminfo.currency  , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 2, 0, "Açılış"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 2, 1, str.tostring(roundedacilisfiyat) + " " + syminfo.currency     , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 3, 0, "Yüksek"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 3, 1, str.tostring(roundedyuksekfiyat) + " " + syminfo.currency    , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 4, 0, "Düşük"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 4, 1, str.tostring(roundeddusukfiyat) + " " + syminfo.currency   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 5, 0, "Önceki \nKapanış"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 5, 1, str.tostring(math.round(kapanisfiyat , 2)) + " " + syminfo.currency    , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.new(color.white , 0))
+
+table.cell(table3, 6, 0, "Açılışa Göre \nDeğişim"   , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 6, 1, str.tostring(AcilisaGoreDegisim , format.percent)    , text_halign = text.align_center, text_size= textstyleFORtable3, text_color= AcilisaGoreDegisim_color)
+
+table.cell(table3, 7, 0, "Önceki Kanışa \nGöre Değişim"  , text_halign = text.align_center, text_size= textstyleFORtable3, text_color=color.white)
+table.cell(table3, 7, 1, str.tostring(OncekiKapanisaGoreDegisim , format.percent)  , text_halign = text.align_center, text_size= textstyleFORtable3, text_color= OncekiKapanisaGoreDegisim_color)
+
+
+
+//#endregion Üçüncü Tablo - Cell Detayları
+
+////////////////////////////////////////////////// =====Üçüncü Tablo - Cell Detayları===== \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+// Kod bitiş.
+// Afiyet olsun <3
